@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="./css/cssLogin.css"/>
+        <title>Logar</title>
+    </h:head>
+    <h:body>
+        <p:dialog style="background-color: #DDDDDD" 
+                  header="REGISTROS DE BOLETINS" 
+                  visible="true" 
+                  closable="false" 
+                  draggable="false" 
+                  resizable="false" 
+                  height="auto"
+                  width="420">
+            <form action="j_spring_security_check" method="post">
+                <h:graphicImage name="./imagens/usuario_login.jpg" width="100%"/>
+                <center>
+                <h:outputText value="Usuário ou senha incorretos!" rendered="#{param.erro}" style="color: darkred"/>
+                </center>
+                <h:panelGrid columns="2" cellpadding="4" style="align-content: center">
+                    <h:outputLabel for="j_username" value="E-mail: *"/>
+                    <h:inputText id="j_username" required="true"/>
+                    <h:outputLabel for="j_password" value="Senha: *"/>
+                    <h:inputSecret id="j_password" required="true"/>
+                    <h:commandButton  value="Entrar"/>
+                    <a href="https://www.w3schools.com">Esqueceu a senha?</a> 
+                </h:panelGrid>
+            </form>
+        </p:dialog>
+    </h:body>
+</html>
+

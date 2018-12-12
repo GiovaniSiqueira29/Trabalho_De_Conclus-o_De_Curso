@@ -1,0 +1,263 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+
+        <ui:composition template="/sistema/viewAdmin/template-admin.xhtml"> 
+
+            <ui:define name="content">
+
+                <h:form id="botaoCadastrar">
+                    <p:commandButton actionListener="#{mandadosJudiciaisMB.atualizarMandadosJudiciais()}"
+                                     value="Cadastrar Mandado Judicial" 
+                                     oncomplete="PF('dialogMandadosJudiciais').show()" 
+                                     update=":formCadastroMandadosJudiciais"/>
+                </h:form>
+                <h:form id="chamarRelatorio">
+                    <p:commandButton value="Relatório" 
+                                     actionListener="#{mandadosJudiciaisMB.chamarRelatorio()}" 
+                                     icon="fa fa-print"
+                                     ajax="false"/>
+                </h:form><p></p>
+                <h:form id="formTabelaMandadosJudiciais" style="text-align: center">
+                    <p:dataTable var="mandadosJudiciais" 
+                                 value="#{mandadosJudiciaisMB.listaMandadosJudiciais}"
+                                 rows="10"
+                                 paginator="true"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15"
+                                 emptyMessage="Resultado não encontrado.">
+                        <p:column headerText="Protocolo" filterBy="#{mandadosJudiciais.id}">
+                            <h:outputText value="#{mandadosJudiciais.id}"/>
+                        </p:column>
+                        <p:column headerText="Policial" filterBy="#{mandadosJudiciais.militar.nome}">
+                            <h:outputText value="#{mandadosJudiciais.militar.nome}"/>
+                        </p:column>
+                        <p:column headerText="Vítima" filterBy="#{mandadosJudiciais.vitimaCivil.nome}">
+                            <h:outputText value="#{mandadosJudiciais.vitimaCivil.nome}"/>
+                        </p:column>
+                        <p:column headerText="Magistrado" filterBy="#{mandadosJudiciais.magistrado.nome}">
+                            <h:outputText value="#{mandadosJudiciais.magistrado.nome}"/>
+                        </p:column>
+                        <p:column headerText="Natureza" filterBy="#{mandadosJudiciais.natureza}">
+                            <h:outputText value="#{mandadosJudiciais.natureza}"/>
+                        </p:column>
+                        <p:column headerText="Artigos" filterBy="#{mandadosJudiciais.artigos}">
+                            <h:outputText value="#{mandadosJudiciais.artigos}"/>
+                        </p:column>
+                        <p:column headerText="Data de Registro">
+                            <h:outputText value="#{mandadosJudiciais.dataRegistro}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Ações" style=" width:20%">
+                            <p:commandButton value="Ver" 
+                                             update=":formDialogInfo:boletimDetalhe"
+                                             oncomplete="PF('infoBoletim').show()" 
+                                             icon="ui-icon-search" 
+                                             title="View"
+                                             style="background: #B3FFD9">
+                                <f:setPropertyActionListener value="#{mandadosJudiciais}" target="#{mandadosJudiciaisMB.mandadosJudiciais}" />
+                            </p:commandButton>
+                            <p:commandButton value="Alterar" 
+                                             oncomplete="PF('dialogMandadosJudiciais').show()" 
+                                             update=":formCadastroMandadosJudiciais"
+                                             style="background: #FFFFB3"
+                                             icon="fa fa-fw fa-edit">
+                                <f:setPropertyActionListener value="#{mandadosJudiciais}" target="#{mandadosJudiciaisMB.mandadosJudiciais}"/>
+                            </p:commandButton>
+                            <p:commandButton value="Excluir" 
+                                             update="@form" 
+                                             actionListener="#{mandadosJudiciaisMB.remover(mandadosJudiciais.id)}"
+                                             style="background: #FFB3B3"
+                                             icon="fa fa-trash">
+                                <p:confirm header="Confirmação" message="Deseja realmente excluir?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                        <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                    </p:confirmDialog>
+                </h:form>
+                <h:form id="formDialogInfo">
+                    <p:dialog header="Informações do Boletim" widgetVar="infoBoletim" modal="true" showEffect="fade" hideEffect="fade">
+                        <p:outputPanel id="boletimDetalhe">
+                            <p:panelGrid  columns="2" rendered="#{not empty mandadosJudiciaisMB.mandadosJudiciais}" columnClasses="label,value">
+                                <h:outputText value="Protocolo :" />
+                                <h:outputText value="#{mandadosJudiciaisMB.mandadosJudiciais.id}" />
+                                <h:outputText value="Policial responsável :" />
+                                <h:outputText value="#{mandadosJudiciaisMB.mandadosJudiciais.militar.nome}" />
+                                <h:outputText value="Vítima: " />
+                                <h:outputText value="#{mandadosJudiciaisMB.mandadosJudiciais.vitimaCivil.nome}" />
+                                <h:outputText value="Data de Registro :" />
+                                <h:outputText value="#{mandadosJudiciaisMB.mandadosJudiciais.dataRegistro}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                                <h:outputText value="Data de Validade :" />
+                                <h:outputText value="#{mandadosJudiciaisMB.mandadosJudiciais.dataValidade}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                                <h:outputText value="Natureza :" />
+                                <h:outputText value="#{mandadosJudiciaisMB.mandadosJudiciais.natureza}" />
+                                <h:outputText value="Artigos :" />
+                                <h:outputText value="#{mandadosJudiciaisMB.mandadosJudiciais.artigos}"/>  
+                                <h:outputText value="Compementos :" />
+                                <h:outputText value="#{mandadosJudiciaisMB.mandadosJudiciais.complementos}"/>  
+                                <h:outputText value="Motivo :" />
+                                <h:outputText value="#{mandadosJudiciaisMB.mandadosJudiciais.motivo}"/>  
+                            </p:panelGrid>
+                        </p:outputPanel>
+                    </p:dialog>
+                </h:form>
+
+                <p:growl autoUpdate="true"/>
+                <p:dialog id="dialogMandadosJudiciais" header="Cadastrar Mandado Judicial" widgetVar="dialogMandadosJudiciais" modal="true" height="auto" width="auto">
+                    <p:messages id ="mensagem" closable="true"/>
+                    <h:form id="formCadastroMandadosJudiciais">
+                        <h:panelGrid columns="2">
+                            <h:outputText value="Nome do militar responsável: "/>
+                            <p:selectOneMenu converter="converterMilitar" value="#{mandadosJudiciaisMB.mandadosJudiciais.militar}" 
+                                             requiredMessage="Escolha um Militar Responsável" 
+                                             required = "true" 
+                                             style="width: 85%">
+                                <f:selectItems value="#{militarMB.listaMilitar}" 
+                                               var ="militar"
+                                               itemLabel="#{militar.nome}"
+                                               itemValue="#{militar}"/>
+                            </p:selectOneMenu> 
+                            <h:outputText value="Nome do Magistrado: "/>
+                            <p:selectOneMenu converter="converterMagistrado" value="#{mandadosJudiciaisMB.mandadosJudiciais.magistrado}" 
+                                             requiredMessage="Escolha um Magistrado Responsável" 
+                                             required = "true" 
+                                             style="width: 85%">
+                                <f:selectItems value="#{magistradoMB.listaMagistrado}" 
+                                               var ="magistrado"
+                                               itemLabel="#{magistrado.nome}"
+                                               itemValue="#{magistrado}"/>
+                            </p:selectOneMenu> 
+                            <h:outputText value="Nome da vítima: "/>
+                            <p:selectOneMenu converter="converterCivil" value="#{mandadosJudiciaisMB.mandadosJudiciais.vitimaCivil}" 
+                                             requiredMessage="Escolha o Nome da Vítima" 
+                                             required = "true" 
+                                             style="width: 85%">
+                                <f:selectItems value="#{civilMB.listaCivil}" 
+                                               var ="civil"
+                                               itemLabel="#{civil.nome}"
+                                               itemValue="#{civil}"/>
+                            </p:selectOneMenu>    
+                            <h:outputText value="Natureza: "/>
+                            <p:inputText value="#{mandadosJudiciaisMB.mandadosJudiciais.natureza}" 
+                                         requiredMessage="Campo Natureza do Crime vazio" 
+                                         required = "true"/>
+                            <h:outputText value="Artigos: "/>
+                            <p:inputText value="#{mandadosJudiciaisMB.mandadosJudiciais.artigos}" 
+                                         requiredMessage="Campo Descrição do Crime vazio" 
+                                         required = "true"/>
+                            <p:outputLabel for="mask" value="Data de Registro:" />
+                            <p:calendar id="mask" 
+                                        value="#{mandadosJudiciaisMB.mandadosJudiciais.dataRegistro}" 
+                                        pattern="dd/MM/yyyy" 
+                                        mask="true"
+                                        requiredMessage="Campo Data de Registro vazio" 
+                                        required = "true"/>
+                            <h:outputText value="Complemeto: "/>
+                            <p:inputText value="#{mandadosJudiciaisMB.mandadosJudiciais.complementos}" 
+                                         requiredMessage="Campo Ambiente do Crime vazio" 
+                                         required = "true"/>
+                            <p:outputLabel for="maskDois" value="Data de Validade:" />
+                            <p:calendar id="maskDois" 
+                                        value="#{mandadosJudiciaisMB.mandadosJudiciais.dataValidade}" 
+                                        pattern="dd/MM/yyyy" 
+                                        mask="true"
+                                        requiredMessage="Campo Data de Validade vazio" 
+                                        required = "true"/>
+                            <h:outputText value="Motivo: "/>
+                            <p:inputText value="#{mandadosJudiciaisMB.mandadosJudiciais.motivo}"/>
+                            <h:outputText value="Estado:"/>
+                            <p:selectOneMenu id="estado" converter="converterEstado" 
+                                             value="#{mandadosJudiciaisMB.mandadosJudiciais.estado}" 
+                                             requiredMessage="Escolha um Estado" 
+                                             required = "true"
+                                             style="width: 83%">
+                                <f:selectItems value="#{estadoMB.listaEstado}" 
+                                               var ="estado"
+                                               itemLabel="#{estado.nome}"
+                                               itemValue="#{estado}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputText value="Cidade:"/>
+                            <p:selectOneMenu 
+                                id="cidade" converter="converterCidade" 
+                                value="#{mandadosJudiciaisMB.mandadosJudiciais.cidade}" 
+                                required = "true" 
+                                requiredMessage="Escolha uma Cidade"
+                                style="width: 83%">                              
+                                <f:selectItems value="#{cidadeMB.listaCidade}" 
+                                               var ="cidade"
+                                               itemLabel="#{cidade.nome}"
+                                               itemValue="#{cidade}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputText value="Bairro: "/>
+                            <p:selectOneMenu 
+                                id="bairro" converter="converterBairro" 
+                                value="#{mandadosJudiciaisMB.mandadosJudiciais.bairro}" 
+                                required = "true" 
+                                requiredMessage="Escolha um Bairro" 
+                                style="width: 83%">
+                                <f:selectItems value="#{bairroMB.listaBairro}" 
+                                               var ="bairro"
+                                               itemLabel="#{bairro.nome}"
+                                               itemValue="#{bairro}"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="CEP: "/>
+                            <p:selectOneMenu 
+                                id="bairroCep" converter="converterBairro" 
+                                value="#{mandadosJudiciaisMB.mandadosJudiciais.bairro}" 
+                                required = "true" 
+                                requiredMessage="Escolha um Cep" 
+                                style="width: 83%">
+                                <f:selectItems value="#{bairroMB.listaBairro}" 
+                                               var ="bairro"
+                                               itemLabel="#{bairro.cep}"
+                                               itemValue="#{bairro}"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="Endereço: "/>
+                            <p:selectOneMenu 
+                                id="bairroRua" converter="converterBairro" 
+                                value="#{mandadosJudiciaisMB.mandadosJudiciais.bairro}" 
+                                required = "true" 
+                                requiredMessage="Escolha uma Rua" 
+                                style="width: 83%">
+                                <f:selectItems value="#{bairroMB.listaBairro}" 
+                                               var ="bairro"
+                                               itemLabel="#{bairro.endereco}"
+                                               itemValue="#{bairro}"/>
+                            </p:selectOneMenu>
+                            <br></br>
+                        </h:panelGrid>
+                        <p:commandButton value="Inserir" 
+                                         actionListener="#{mandadosJudiciaisMB.inserir()}"
+                                         oncomplete="handleComplete(xhr, status, args)"
+                                         update=":formTabelaMandadosJudiciais"
+                                         style="width: 100%"/>
+                    </h:form>
+                </p:dialog> 
+                <script type="text/javascript">
+                    function handleComplete(xhr, status, args) {
+                        if (!args.validationFailed) {
+                            PF('dialogMandadosJudiciais').hide();
+                        } else {
+                        }
+                    }
+                </script>
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

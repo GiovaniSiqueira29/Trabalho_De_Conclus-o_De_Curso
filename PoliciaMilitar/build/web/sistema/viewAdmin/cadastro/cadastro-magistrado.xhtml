@@ -1,0 +1,295 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <body>
+        <ui:composition template="/sistema/viewAdmin/template-admin.xhtml"> 
+            <ui:define name="content">
+
+                <p:commandButton id="botaoCadastrar"
+                                 actionListener="#{magistradoMB.atualizarCadastroMagistrado()}"
+                                 resetValues="true"
+                                 value="Cadastrar Magistrado" 
+                                 oncomplete="PF('dialogMagistrado').show()" 
+                                 update=":formCadastroMagistrado"/>
+                <h:form id="chamarRelatorio">
+                    <p:commandButton value="Relatório" 
+                                     actionListener="#{magistradoMB.chamarRelatorio()}" 
+                                     icon="fa fa-print"
+                                     ajax="false"/>
+                </h:form><p></p>
+
+                <h:form id="formTabelaMagistrado" style="text-align: center">
+                    <p:dataTable id = "tabelaMagistrado" 
+                                 var="magistrado" 
+                                 value="#{magistradoMB.listaMagistrado}" 
+                                 rows="10"
+                                 paginator="true"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15"
+                                 emptyMessage="Resultado não encontrado.">
+                        <p:column filterBy="#{magistrado.nome}" headerText="Nome">
+                            <h:outputText value="#{magistrado.nome}"/>
+                        </p:column>
+                        <p:column headerText="CPF" filterBy="#{magistrado.cpf}">
+                            <h:outputText value="#{magistrado.cpf}">
+                                <f:converter converterId="converterCpf" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Situação" filterBy="#{magistrado.situacao}">
+                            <h:outputText value="#{magistrado.situacao}">
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Pas. Criminais" filterBy="#{magistrado.passagem}">
+                            <h:outputText value="#{magistrado.passagem}">
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Comarca" style="width:20%" filterBy="#{magistrado.comarca}">
+                            <h:outputText value="#{magistrado.comarca}">
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Ações" style="width:20%">
+                            <p:commandButton value="Alterar" 
+                                             oncomplete="PF('dialogMagistrado').show()" 
+                                             update=":formCadastroMagistrado"
+                                             style="background: #FFFFB3"
+                                             icon="fa fa-fw fa-edit">
+                                <f:setPropertyActionListener value="#{magistrado}" target="#{magistradoMB.magistrado}"/>
+                            </p:commandButton>
+                            <p:commandButton value="Excluir" 
+                                             icon="fa fa-trash" 
+                                             style="background: #FFB3B3" 
+                                             update="@form" 
+                                             actionListener="#{magistradoMB.remover(magistrado.id)}">
+                                <p:confirm header="Confirmação" message="Deseja realmente excluir?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                            <h:commandLink>
+                                <p:graphicImage name="../css/imagens/pdf.png" width="24"/>
+                                <p:dataExporter type="pdf" target="tabelaMagistrado" fileName="magistradoes"/>
+                            </h:commandLink>
+
+                        </p:column>
+                    </p:dataTable>
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                        <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                    </p:confirmDialog>
+                </h:form>
+
+                <p:growl autoUpdate="true"/>
+                <p:dialog id="dialogMagistrado" header="Cadastrar Magistrado" widgetVar="dialogMagistrado" modal="true" height="auto" width="auto" >
+                    <p:messages id ="mensagem" closable="true"/>
+                    <h:form id="formCadastroMagistrado">
+                        <h:panelGrid columns="4" >
+                            <h:outputText value="Nome:"/>
+                            <p:inputText value="#{magistradoMB.magistrado.nome}" 
+                                         requiredMessage="Campo Nome vazio" 
+                                         required = "true"
+                                         validator="validarNome"/>
+
+                            <h:outputLabel for="cpf" value="CPF:" />
+                            <p:inputText value="#{magistradoMB.magistrado.cpf}"
+                                         id="cpf"
+                                         requiredMessage = "Campo CPF vazio" 
+                                         required = "true"
+                                         maxlength = "11"
+                                         validator="validarCpf"/>   
+
+                            <h:outputText value="RG:"/>
+                            <p:inputText value="#{magistradoMB.magistrado.rg}" 
+                                         requiredMessage="Campo RG vazio" 
+                                         required = "true"
+                                         maxlength="13">
+                                <f:validateLength minimum="8" maximum="13"/>
+                            </p:inputText>
+
+                            <h:outputLabel for="tituloEleitoral" value="Título Eleitoral: "/>
+                            <p:inputMask value="#{magistradoMB.magistrado.tituloEleitoral}"
+                                         maxlength="12"
+                                         required="true"
+                                         requiredMessage="Campo Titulo Eleitoral vazio"
+                                         mask="9999.9999.9999"/>
+
+                            <h:outputLabel for="pisPasep" value="Pis/Pasep: "/>
+                            <p:inputMask value="#{magistradoMB.magistrado.pisPasep}"
+                                         maxlength="11"
+                                         required="true"
+                                         requiredMessage="Campo Pis/Pasep vazio"
+                                         mask="999.99999.99-9"/>
+
+                            <h:outputText value="Nome da Mãe:"/>
+                            <p:inputText value="#{magistradoMB.magistrado.nomeMae}"/>
+
+                            <h:outputText value="Nome do Pai:"/>
+                            <p:inputText value="#{magistradoMB.magistrado.nomePai}"/>      
+
+                            <h:outputText value="Dispensa/Alistamento:"/>
+                            <p:inputText value="#{magistradoMB.magistrado.dispensaReservista}"
+                                         requiredMessage="Campo Dispensa/Alistamento vazio" 
+                                         required = "true"/>
+
+                            <h:outputText value="Estado Civil "/> 
+                            <h:selectOneMenu value="#{magistradoMB.magistrado.estadoCivil}"
+                                             requiredMessage="Campo Estado Civil vazio"
+                                             required="true" 
+                                             style="width: 100%">
+                                <f:selectItem itemLabel="Selecione" itemValue=""/>
+                                <f:selectItem itemLabel="Solteiro" itemValue="Solteiro" />
+                                <f:selectItem itemLabel="Casado" itemValue="Casado"/>
+                                <f:selectItem itemLabel="União Estável" itemValue="União Estável" />
+                                <f:selectItem itemLabel="Viúvo" itemValue="Viúvo"/>
+                            </h:selectOneMenu>
+
+                            <p:outputLabel for="mask" value="Data de Nascimento:" />
+                            <p:calendar id="mask" 
+                                        value="#{magistradoMB.magistrado.dtNasc}" 
+                                        pattern="dd/MM/yyyy" 
+                                        mask="true"
+                                        requiredMessage="Campo Data de Nascimento vazio" 
+                                        required = "true"/>
+
+                            <p:outputLabel for="fone" value="Celular:" />
+                            <p:inputMask id="fone" 
+                                         value="#{magistradoMB.magistrado.fone}" 
+                                         mask="(99)99999-9999"/>
+
+                            <p:outputLabel for="foneResidencial" 
+                                           value="Telefone Fixo:" />
+                            <p:inputMask id="foneResidencial" 
+                                         value="#{magistradoMB.magistrado.foneResidencial}" 
+                                         mask="(99)9999-9999"/>
+
+                            <h:outputText value="E-mail:"/>
+                            <p:inputText value="#{magistradoMB.magistrado.email}"
+                                         validator="validarEmail"/>
+
+                            <h:outputText value="Sexo: "/> 
+                            <h:selectOneMenu value="#{magistradoMB.magistrado.sexo}"
+                                             requiredMessage="Campo Sexo vazio"
+                                             required="true" 
+                                             style="width: 100%">
+                                <f:selectItem itemLabel="Selecione" itemValue=""/>
+                                <f:selectItem itemLabel="M" itemValue="Masculino" />
+                                <f:selectItem itemLabel="F" itemValue="Feminino"/>
+                            </h:selectOneMenu>
+
+                            <h:outputText value="Estado:"/>
+                            <p:selectOneMenu id="estado" 
+                                             converter="converterEstado" 
+                                             value="#{magistradoMB.magistrado.estado}" 
+                                             requiredMessage="Escolha um Estado" 
+                                             required = "true"
+                                             style="width: 83%">
+                                <f:selectItems value="#{estadoMB.listaEstado}" 
+                                               var ="estado"
+                                               itemLabel="#{estado.nome}"
+                                               itemValue="#{estado}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputText value="Cidade:"/>
+                            <p:selectOneMenu 
+                                id="cidade" converter="converterCidade" 
+                                value="#{magistradoMB.magistrado.cidade}" 
+                                required = "true" 
+                                requiredMessage="Escolha uma Cidade" 
+                                style="width: 83%">
+                                <f:selectItems value="#{cidadeMB.listaCidade}" 
+                                               var ="cidade"
+                                               itemLabel="#{cidade.nome}"
+                                               itemValue="#{cidade}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputText value="Bairro:"/>
+                            <p:selectOneMenu 
+                                id="bairro" converter="converterBairro" 
+                                value="#{magistradoMB.magistrado.bairro}" 
+                                required = "true" 
+                                requiredMessage="Escolha um Bairro" 
+                                style="width: 83%">
+                                <f:selectItems value="#{bairroMB.listaBairro}" 
+                                               var ="bairro"
+                                               itemLabel="#{bairro.nome}"
+                                               itemValue="#{bairro}"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="CEP: "/>
+                            <p:selectOneMenu 
+                                id="bairroCep" converter="converterBairro" 
+                                value="#{magistradoMB.magistrado.bairro}" 
+                                required = "true" 
+                                requiredMessage="Escolha um Cep" 
+                                style="width: 83%">
+                                <f:selectItems value="#{bairroMB.listaBairro}" 
+                                               var ="bairro"
+                                               itemLabel="#{bairro.cep}"
+                                               itemValue="#{bairro}"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="Endereço: "/>
+                            <p:selectOneMenu 
+                                id="bairroRua" converter="converterBairro" 
+                                value="#{magistradoMB.magistrado.bairro}" 
+                                required = "true" 
+                                requiredMessage="Escolha uma Rua" 
+                                style="width: 83%">
+                                <f:selectItems value="#{bairroMB.listaBairro}" 
+                                               var ="bairro"
+                                               itemLabel="#{bairro.endereco}"
+                                               itemValue="#{bairro}"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="Número da Casa:"/>
+                            <p:inputText value="#{magistradoMB.magistrado.numeroCasa}" 
+                                         requiredMessage="Campo Número da Casa vazio" 
+                                         required = "true"/>
+
+                            <h:outputText value="Passagens Criminais:"/>
+                            <p:inputText value="#{magistradoMB.magistrado.passagem}"
+                                         requiredMessage="Campo Passagens Criminais vazio" 
+                                         required = "true"/>
+
+                            <h:outputText value="Situação:"/>
+                            <h:selectOneMenu value="#{magistradoMB.magistrado.situacao}"
+                                             requiredMessage="Campo Situação vazio"
+                                             required="true" 
+                                             style="width: 100%">
+                                <f:selectItem itemLabel="Selecione" itemValue=""/>
+                                <f:selectItem itemLabel="Em Liberdade" itemValue="Em Liberdade"/>
+                                <f:selectItem itemLabel="Foragido" itemValue="Foragido"/>
+                                <f:selectItem itemLabel="Procurado" itemValue="Procurado"/>
+                                <f:selectItem itemLabel="Detido" itemValue="Detido"/>
+                            </h:selectOneMenu>
+
+                            <h:outputText value="Profissão:"/>
+                            <p:inputText value="#{magistradoMB.magistrado.profissao}" 
+                                         requiredMessage="Campo Profissão vazio" 
+                                         required = "true"/>  
+
+                            <h:outputText value="Comarca: "/>
+                            <p:inputText value="#{magistradoMB.magistrado.comarca}" 
+                                         requiredMessage="Campo Comarca  vazio" 
+                                         required = "true"/>  
+                        </h:panelGrid>
+                        <br></br>
+                        <p:commandButton value="Inserir" 
+                                         actionListener="#{magistradoMB.inserir()}"
+                                         oncomplete="handleComplete(xhr, status, args)"
+                                         update=":formTabelaMagistrado"
+                                         style="width: 100%"/>
+                    </h:form>
+                </p:dialog> 
+                <script type="text/javascript">
+                    function handleComplete(xhr, situacao, args) {
+                        if (!args.validationFailed) {
+                            PF('dialogMagistrado').hide();
+                        } else {
+                        }
+                    }
+                </script>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>
+

@@ -1,0 +1,93 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+
+        <ui:composition template="/sistema/viewAdmin/template-admin.xhtml"> 
+
+            <ui:define name="content">
+
+                <h:form id="botaoCadastrar">
+                    <p:commandButton 
+                        actionListener="#{estadoMB.atualizarEstado()}"
+                        value="Cadastrar Estado" 
+                        oncomplete="PF('dialogEstado').show()" 
+                        update=":formCadastroEstado"/>
+                </h:form><p></p>
+
+                <h:form id="formTabelaEstado" style="text-align: center">
+                    <p:dataTable var="estado" value="#{estadoMB.listaEstado}">
+                        <p:column headerText="Nome">
+                            <h:outputText value="#{estado.nome}"/>
+                        </p:column>
+                        <p:column headerText="Sigla" style=" width:20%">
+                            <h:outputText value="#{estado.sigla}"/>
+                        </p:column>
+                        <p:column headerText="Ações" style=" width:20%">
+                            <p:commandButton value="Alterar" 
+                                             oncomplete="PF('dialogEstado').show()" 
+                                             update=":formCadastroEstado"
+                                             style="background: #FFFFB3"
+                                             icon="fa fa-fw fa-edit">
+                                <f:setPropertyActionListener value="#{estado}" target="#{estadoMB.estado}"/>
+                            </p:commandButton>
+                            <p:commandButton value="Excluir" 
+                                             icon="fa fa-trash" 
+                                             style="background: #FFB3B3" 
+                                             update="@form" 
+                                             actionListener="#{estadoMB.remover(estado.id)}">
+                                <p:confirm header="Confirmação" message="Deseja realmente excluir?" icon="ui-icon-alert" />
+                            </p:commandButton>
+
+                        </p:column>
+                    </p:dataTable>
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                        <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                    </p:confirmDialog>
+                </h:form>
+                
+                <p:growl autoUpdate="true"/>
+                    <p:dialog id="dialogEstado" header="Cadastro de Estados" widgetVar="dialogEstado" modal="true"  height="auto" width="auto">                 
+                        <p:messages id ="mensagem" closable="true"/>    
+                        <h:form id="formCadastroEstado">
+                            <h:panelGrid columns="2">
+                                <h:outputText value="Nome:"/>
+                                <p:inputText value="#{estadoMB.estado.nome}" 
+                                             requiredMessage="Campo Nome vazio" 
+                                             required = "true"/>
+                                <h:outputText value="Sigla:"/>
+                                <p:inputText value="#{estadoMB.estado.sigla}" 
+                                             requiredMessage="Campo Sigla vazio" 
+                                             required = "true"
+                                             maxlength="2"
+                                             validator="validarSigla"/>
+                                <br></br>
+                            </h:panelGrid>
+                            <p:commandButton value="Inserir" 
+                                             actionListener="#{estadoMB.inserir()}"
+                                             oncomplete="handleComplete(xhr, status, args)"
+                                             update=":formTabelaEstado"
+                                             style="width: 100%"/>                       
+                        </h:form>
+
+                    </p:dialog> 
+                <script type="text/javascript">
+                    function handleComplete(xhr, status, args) {
+                        if (!args.validationFailed) {
+                            PF('dialogEstado').hide();
+                        } else {
+                        }
+                    }
+                </script>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

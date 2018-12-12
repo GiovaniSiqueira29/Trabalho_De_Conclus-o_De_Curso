@@ -1,0 +1,334 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+        <p:growl autoUpdate="true">
+            <ui:composition template="/sistema/viewAdmin/template-admin.xhtml"> 
+                <ui:define name="content">
+
+                    <p:commandButton id="botaoCadastrar"
+                                     actionListener="#{militarMB.atualizarCadastroMilitar()}"
+                                     resetValues="true"
+                                     value="Cadastrar Policiais" 
+                                     oncomplete="PF('dialogMilitar').show()" 
+                                     update=":formCadastroMilitar"/>
+                    <h:form id="chamarRelatorio">
+                        <p:commandButton value="Relatório" 
+                                         actionListener="#{militarMB.chamarRelatorio()}" 
+                                         icon="fa fa-print"
+                                         ajax="false"/>
+                    </h:form><p></p>
+
+                    <h:form id="formTabelaMilitar" style="text-align: center">
+                        <p:dataTable id = "tabelaMilitar" 
+                                     var="militar" 
+                                     value="#{militarMB.listaMilitar}"
+                                     rows="10"
+                                     paginator="true"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15"
+                                     emptyMessage="Resultado não encontrado.">
+                            <p:column filterBy="#{militar.nome}" headerText="Nome" filterMatchMode="contains">
+                                <h:outputText value="#{militar.nome}"/>
+                            </p:column>
+                            <p:column headerText="CPF" style="width:20%" filterBy="#{militar.cpf}">
+                                <h:outputText value="#{militar.cpf}">
+                                    <f:converter converterId="converterCpf"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Situação" style="width:20%" filterBy="#{militar.situacao}">
+                                <h:outputText value="#{militar.situacao}">
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Pas. Criminais" style="width:20%" filterBy="#{militar.passagem}">
+                                <h:outputText value="#{militar.passagem}">
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Ações" style="width:20%">
+                                <p:commandButton value="Ver"
+                                                 update=":formDialogInfo:militarDetalhe" 
+                                                 oncomplete="PF('infoMilitar').show()" 
+                                                 icon="ui-icon-search" 
+                                                 title="View"
+                                                 style="background: #B3FFD9">
+                                    <f:setPropertyActionListener value="#{militar}" target="#{militarMB.militar}" />
+                                </p:commandButton>
+                                <p:commandButton 
+                                    value="Alterar" 
+                                    oncomplete="PF('dialogMilitar').show()" 
+                                    update=":formCadastroMilitar"     
+                                    style="background: #FFFFB3"
+                                    icon="fa fa-fw fa-edit">
+                                    <f:setPropertyActionListener value="#{militar}" target="#{militarMB.militar}"/>
+                                </p:commandButton>
+                                <p:commandButton 
+                                    id="botaoAlterar"
+                                    value="Excluir" 
+                                    icon="fa fa-trash" 
+                                    style="background: #FFB3B3" 
+                                    update="@form" 
+                                    actionListener="#{militarMB.remover(militar.id)}">
+                                    <p:confirm header="Confirmação" message="Deseja realmente excluir?" icon="ui-icon-alert" />
+                                </p:commandButton>
+                                <h:commandLink>
+                                    <p:graphicImage name="../css/imagens/pdf.png" width="24"/>
+                                    <p:dataExporter type="pdf" target="tabelaMilitar" fileName="militares"/>
+                                </h:commandLink>
+
+                            </p:column>
+                        </p:dataTable>
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                            <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                            <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                        </p:confirmDialog>
+                    </h:form>
+
+                    <h:form id="formDialogInfo">
+                        <p:dialog header="Informações do Policial" widgetVar="infoMilitar" modal="true" showEffect="fade" hideEffect="fade">
+                            <p:outputPanel id="militarDetalhe">
+                                <p:panelGrid  columns="2" rendered="#{not empty militarMB.militar}" columnClasses="label,value">
+                                    <h:outputText value="Identificador :" />
+                                    <h:outputText value="#{militarMB.militar.id}" />
+                                    <h:outputText value="Nome :" />
+                                    <h:outputText value="#{militarMB.militar.nome}" />
+                                    <h:outputText value="Cpf: " />
+                                    <h:outputText value="#{militarMB.militar.cpf}" />
+                                    <h:outputText value="Rg:" />
+                                    <h:outputText value="#{militarMB.militar.rg}" />
+                                    <h:outputText value="Registro Militar :" />
+                                    <h:outputText value="#{militarMB.militar.registroMilitar}"/>
+                                </p:panelGrid>
+                            </p:outputPanel>
+                        </p:dialog>
+                    </h:form>
+
+                <p:growl autoUpdate="true"/>
+                    <p:dialog id="dialogMilitar" header="Cadastrar Policial" widgetVar="dialogMilitar" modal="true" height="auto" width="auto" >
+                        <p:messages id ="mensagem" closable="true"/>
+                        <h:form id="formCadastroMilitar">
+                            <h:panelGrid columns="4" >                          
+                                <h:outputText value="Nome:"/>
+                                <p:inputText value="#{militarMB.militar.nome}" 
+                                             requiredMessage="Campo Nome vazio" 
+                                             required = "true"
+                                             validator="validarNome"
+                                             placeholder="Digite o nome"/>
+                                <h:outputLabel for="cpf" value="CPF:" />
+                                <p:inputText value="#{militarMB.militar.cpf}"
+                                             id="cpf"
+                                             requiredMessage = "Campo CPF vazio" 
+                                             required = "true"
+                                             maxlength = "11"
+                                             validator="validarCpf"/>   
+
+                                <h:outputText value="RG:"/>
+                                <p:inputText value="#{militarMB.militar.rg}" 
+                                             requiredMessage="Campo RG Vazio" 
+                                             required = "true"
+                                             maxlength="13">
+                                    <f:validateLength minimum="8" maximum="13"/>
+                                </p:inputText>
+
+                                <h:outputLabel for="tituloEleitoral" value="Título Eleitoral: "/>
+                                <p:inputMask mask="9999.9999.9999"
+                                             value="#{militarMB.militar.tituloEleitoral}" 
+                                             requiredMessage="Campo Título Eleitoral vazio" 
+                                             required = "true"
+                                             maxlength="12"/>
+
+                                <h:outputLabel for="pisPasep" value="Pis/Pasep: "/>
+                                <p:inputMask value="#{militarMB.militar.pisPasep}" 
+                                             requiredMessage="Campo Pis/Pasep vazio"
+                                             required="true"
+                                             maxlength="11"
+                                             mask="999.99999.99-9"/>
+
+                                <h:outputText value="Nome da Mãe:"/>
+                                <p:inputText value="#{militarMB.militar.nomeMae}"/>
+
+                                <h:outputText value="Nome do Pai:"/>
+                                <p:inputText value="#{militarMB.militar.nomePai}"/>      
+
+                                <h:outputText value="Dispensa/Alistamento:"/>
+                                <p:inputText value="#{militarMB.militar.dispensaReservista}" 
+                                             requiredMessage="Campo Dispensa/Alistamento vazio" 
+                                             required = "true"/>
+
+                                <h:outputText value="Estado Civil "/> 
+                                <h:selectOneMenu value="#{militarMB.militar.estadoCivil}"
+                                                 requiredMessage="Campo Estado Civil vazio"
+                                                 required="true" 
+                                                 style="width: 100%">
+                                    <f:selectItem itemLabel="Selecione" itemValue=""/>
+                                    <f:selectItem itemLabel="Solteiro" itemValue="Solteiro" />
+                                    <f:selectItem itemLabel="Casado" itemValue="Casado"/>
+                                    <f:selectItem itemLabel="União Estável" itemValue="União Estável" />
+                                    <f:selectItem itemLabel="Viúvo" itemValue="Viúvo"/>
+                                </h:selectOneMenu>
+
+                                <p:outputLabel for="mask" value="Data de Nascimento:" />
+                                <p:calendar id="mask" 
+                                            value="#{militarMB.militar.dtNasc}" 
+                                            pattern="dd/MM/yyyy" 
+                                            mask="true"
+                                            requiredMessage="Campo Data de Nascimento vazio" 
+                                            required = "true"/>
+
+                                <p:outputLabel for="fone" 
+                                               value="Celular:" />
+                                <p:inputMask id="fone" 
+                                             value="#{militarMB.militar.fone}" 
+                                             mask="(99)99999-9999"/>
+
+                                <p:outputLabel for="foneResidencial" 
+                                               value="Telefone Fixo:" />
+                                <p:inputMask id="foneResidencial" 
+                                             value="#{militarMB.militar.foneResidencial}" 
+                                             mask="(99)9999-9999"/>
+
+                                <h:outputText value="E-mail:"/>
+                                <p:inputText value="#{militarMB.militar.email}" 
+                                             requiredMessage="Campo E-mail vazio"
+                                             required = "true" 
+                                             validator="validarEmail"/>
+                                <h:outputText value="Sexo: "/> 
+                                <h:selectOneMenu value="#{militarMB.militar.sexo}"
+                                                 requiredMessage="Campo Sexo vazio"
+                                                 required="true" 
+                                                 style="width: 100%">
+                                    <f:selectItem itemLabel="Selecione" itemValue=""/>
+                                    <f:selectItem itemLabel="M" itemValue="Masculino" />
+                                    <f:selectItem itemLabel="F" itemValue="Feminino"/>
+                                </h:selectOneMenu>                 
+                                <h:outputText value="Estado:"/>
+                                <p:selectOneMenu id="estado" converter="converterEstado" 
+                                                 value="#{militarMB.militar.estado}" 
+                                                 requiredMessage="Escolha um Estado" 
+                                                 required = "true"
+                                                 style="width: 83%">
+                                    <f:selectItems value="#{estadoMB.listaEstado}" 
+                                                   var ="estado"
+                                                   itemLabel="#{estado.nome}"
+                                                   itemValue="#{estado}"/>
+                                </p:selectOneMenu>
+
+                                <h:outputText value="Cidade:"/>
+                                <p:selectOneMenu 
+                                    id="cidade" converter="converterCidade" 
+                                    value="#{militarMB.militar.cidade}" 
+                                    required = "true" 
+                                    requiredMessage="Escolha uma Cidade"
+                                    style="width: 83%">                              
+                                    <f:selectItems value="#{cidadeMB.listaCidade}" 
+                                                   var ="cidade"
+                                                   itemLabel="#{cidade.nome}"
+                                                   itemValue="#{cidade}"/>
+                                </p:selectOneMenu>
+
+                                <h:outputText value="Bairro: "/>
+                                <p:selectOneMenu 
+                                    id="bairro" converter="converterBairro" 
+                                    value="#{militarMB.militar.bairro}" 
+                                    required = "true" 
+                                    requiredMessage="Escolha um Bairro" 
+                                    style="width: 83%">
+                                    <f:selectItems value="#{bairroMB.listaBairro}" 
+                                                   var ="bairro"
+                                                   itemLabel="#{bairro.nome}"
+                                                   itemValue="#{bairro}"/>
+                                </p:selectOneMenu>
+                                <h:outputText value="CEP: "/>
+                                <p:selectOneMenu 
+                                    id="bairroCep" converter="converterBairro" 
+                                    value="#{militarMB.militar.bairro}" 
+                                    required = "true" 
+                                    requiredMessage="Escolha um Cep" 
+                                    style="width: 83%">
+                                    <f:selectItems value="#{bairroMB.listaBairro}" 
+                                                   var ="bairro"
+                                                   itemLabel="#{bairro.cep}"
+                                                   itemValue="#{bairro}"/>
+                                </p:selectOneMenu>
+                                <h:outputText value="Endereço: "/>
+                                <p:selectOneMenu 
+                                    id="bairroRua" converter="converterBairro" 
+                                    value="#{militarMB.militar.bairro}" 
+                                    required = "true" 
+                                    requiredMessage="Escolha uma Rua" 
+                                    style="width: 83%">
+                                    <f:selectItems value="#{bairroMB.listaBairro}" 
+                                                   var ="bairro"
+                                                   itemLabel="#{bairro.endereco}"
+                                                   itemValue="#{bairro}"/>
+                                </p:selectOneMenu>
+
+                                <h:outputText value="Número da Casa:"/>
+                                <p:inputText value="#{militarMB.militar.numeroCasa}" 
+                                             requiredMessage="Campo Número da Casa vazio" 
+                                             required = "true"/>
+
+                                <h:outputText value="Passagens Criminais:"/>
+                                <p:inputText value="#{militarMB.militar.passagem}"
+                                             requiredMessage="Campo Passagens criminais vazio" 
+                                             required = "true"/>
+
+                                <h:outputText value="Registro Militar:"/>
+                                <p:inputText value="#{militarMB.militar.registroMilitar}" 
+                                             requiredMessage="Campo Registro Militar vazio" 
+                                             required = "true"/>  
+
+                                <h:outputText value="Senha:"/>
+                                <p:password value="#{militarMB.militar.senha}" 
+                                            requiredMessage="Campo Senha vazio" 
+                                            required = "true"/>  
+
+                                <h:outputText value="Situação:"/>
+                                <h:selectOneMenu value="#{militarMB.militar.situacao}"
+                                                 requiredMessage="Campo Situação vazio"
+                                                 required="true" 
+                                                 style="width: 100%">
+                                    <f:selectItem itemLabel="Selecione" itemValue=""/>
+                                    <f:selectItem itemLabel="Em Liberdade" itemValue="Em Liberdade"/>
+                                    <f:selectItem itemLabel="Foragido" itemValue="Foragido"/>
+                                    <f:selectItem itemLabel="Procurado" itemValue="Procurado"/>
+                                    <f:selectItem itemLabel="Detido" itemValue="Detido"/>
+                                </h:selectOneMenu>    
+
+                                <h:outputText value="Profissão:"/>
+                                <h:selectOneMenu value="#{militarMB.militar.profissao}"
+                                                 requiredMessage="Campo Profissão vazio"
+                                                 required="true" 
+                                                 validator="validarProfissao"
+                                                 style="width: 100%">
+                                    <f:selectItem itemLabel="Selecione" itemValue=""/>
+                                    <f:selectItem itemLabel="MILITAR" itemValue="MILITAR" />
+                                    <f:selectItem itemLabel="CIVIL" itemValue="CIVIL"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+                            <br></br>
+                            <p:commandButton value="Inserir" 
+                                             actionListener="#{militarMB.inserir()}"
+                                             oncomplete="handleComplete(xhr, status, args)"
+                                             update=":formTabelaMilitar"
+                                             style="width: 100%"/>
+                        </h:form>
+                    </p:dialog> 
+                    <script type="text/javascript">
+                        function handleComplete(xhr, situacao, args) {
+                            if (!args.validationFailed) {
+                                PF('dialogMilitar').hide();
+                            } else {
+                            }
+                        }
+                    </script>
+                </ui:define>
+
+            </ui:composition>
+        </p:growl>   
+    </body>
+</html>

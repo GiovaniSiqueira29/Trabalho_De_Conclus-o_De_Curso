@@ -1,0 +1,278 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+
+        <ui:composition template="/sistema/viewAdmin/template-admin.xhtml"> 
+
+            <ui:define name="content">
+
+                <h:form id="botaoCadastrar">
+                    <p:commandButton actionListener="#{boletimOcorrenciaMB.atualizarBoletimOcorrencia()}"
+                                     value="Cadastrar Boletim" 
+                                     oncomplete="PF('dialogBoletimOcorrencia').show()" 
+                                     update=":formCadastroBoletimOcorrencia"/>
+                </h:form>
+                <h:form id="chamarRelatorio">
+                    <p:commandButton value="Relatório" 
+                                     actionListener="#{boletimOcorrenciaMB.chamarRelatorio()}" 
+                                     icon="fa fa-print"
+                                     ajax="false"/>
+                </h:form><p></p>
+                <h:form id="formTabelaBoletimOcorrencia" style="text-align: center">
+                    <p:dataTable var="boletimOcorrencia" 
+                                 value="#{boletimOcorrenciaMB.listaBoletimOcorrencia}"
+                                 rows="10"
+                                 paginator="true"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15"
+                                 emptyMessage="Resultado não encontrado.">
+                        <p:column headerText="Protocolo" filterBy="#{boletimOcorrencia.id}">
+                            <h:outputText value="#{boletimOcorrencia.id}"/>
+                        </p:column>
+                        <p:column headerText="Policial Responsável" filterBy="#{boletimOcorrencia.militar.nome}">
+                            <h:outputText value="#{boletimOcorrencia.militar.nome}"/>
+                        </p:column>
+                        <p:column headerText="Vítima" filterBy="#{boletimOcorrencia.vitimaCivil.nome}">
+                            <h:outputText value="#{boletimOcorrencia.vitimaCivil.nome}"/>
+                        </p:column>
+                        <p:column headerText="Natureza do Crime" filterBy="#{boletimOcorrencia.naturezaCrime}">
+                            <h:outputText value="#{boletimOcorrencia.naturezaCrime}"/>
+                        </p:column>
+                        <p:column headerText="Data do Fato">
+                            <h:outputText value="#{boletimOcorrencia.dtFato}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Hora do Fato">
+                            <h:outputText value="#{boletimOcorrencia.horaInicioFato}">
+                                <f:convertDateTime pattern="HH:mm"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Ações" style=" width:20%">
+                            <p:commandButton value="Ver" 
+                                             update=":formDialogInfo:boletimDetalhe"
+                                             oncomplete="PF('infoBoletim').show()" 
+                                             icon="ui-icon-search" 
+                                             title="View"
+                                             style="background: #B3FFD9">
+                                <f:setPropertyActionListener value="#{boletimOcorrencia}" target="#{boletimOcorrenciaMB.boletimOcorrencia}" />
+                            </p:commandButton>
+                            <p:commandButton value="Alterar" 
+                                             oncomplete="PF('dialogBoletimOcorrencia').show()" 
+                                             update=":formCadastroBoletimOcorrencia"
+                                             style="background: #FFFFB3"
+                                             icon="fa fa-fw fa-edit">
+                                <f:setPropertyActionListener value="#{boletimOcorrencia}" target="#{boletimOcorrenciaMB.boletimOcorrencia}"/>
+                            </p:commandButton>
+                            <p:commandButton value="Excluir" 
+                                             update="@form" 
+                                             actionListener="#{boletimOcorrenciaMB.remover(boletimOcorrencia.id)}"
+                                             style="background: #FFB3B3"
+                                             icon="fa fa-trash">
+                                <p:confirm header="Confirmação" message="Deseja realmente excluir?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                        <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                    </p:confirmDialog>
+                </h:form>
+                <h:form id="formDialogInfo">
+                    <p:dialog header="Informações do Boletim" widgetVar="infoBoletim" modal="true" showEffect="fade" hideEffect="fade">
+                        <p:outputPanel id="boletimDetalhe">
+                            <p:panelGrid  columns="2" rendered="#{not empty boletimOcorrenciaMB.boletimOcorrencia}" columnClasses="label,value">
+                                <h:outputText value="Protocolo :" />
+                                <h:outputText value="#{boletimOcorrenciaMB.boletimOcorrencia.id}" />
+                                <h:outputText value="Policial responsável :" />
+                                <h:outputText value="#{boletimOcorrenciaMB.boletimOcorrencia.militar.nome}" />
+                                <h:outputText value="Vítima: " />
+                                <h:outputText value="#{boletimOcorrenciaMB.boletimOcorrencia.vitimaCivil.nome}" />
+                                <h:outputText value="Natureza do crime :" />
+                                <h:outputText value="#{boletimOcorrenciaMB.boletimOcorrencia.naturezaCrime}" />
+                                <h:outputText value="Descrição do Crime :" />
+                                <h:outputText value="#{boletimOcorrenciaMB.boletimOcorrencia.descricaoCrime}" />
+                                <h:outputText value="Ambiente do crime :" />
+                                <h:outputText value="#{boletimOcorrenciaMB.boletimOcorrencia.ambienteCrime}" />
+<!--                                <h:outputText value="Estado :" />
+                                <h:outputText value="#{boletimOcorrenciaMB.boletimOcorrencia.estado.nome}" />
+                                <h:outputText value="Cidade :" />
+                                <h:outputText value="#{boletimOcorrenciaMB.boletimOcorrencia.cidade.nome}" />
+                                <h:outputText value="Rua :" />
+                                <h:outputText value="#{boletimOcorrenciaMB.boletimOcorrencia.bairro.endereco}" />-->
+                                <h:outputText value="Hora do fato :" />
+                                <h:outputText value="#{boletimOcorrenciaMB.boletimOcorrencia.horaInicioFato}">  
+                                    <f:convertDateTime pattern="HH:mm"/> 
+                                </h:outputText>
+                            </p:panelGrid>
+                        </p:outputPanel>
+                    </p:dialog>
+                </h:form>
+
+                <p:growl autoUpdate="true"/>
+                <p:dialog id="dialogBoletimOcorrencia" header="Cadastrar Boletim de Ocorrência" widgetVar="dialogBoletimOcorrencia" modal="true" height="auto" width="auto">
+                    <p:messages id ="mensagem" closable="true"/>
+                    <h:form id="formCadastroBoletimOcorrencia">
+                        <h:panelGrid columns="2">
+                            <h:outputText value="Nome do militar responsável: "/>
+                            <p:selectOneMenu converter="converterMilitar" value="#{boletimOcorrenciaMB.boletimOcorrencia.militar}" 
+                                             requiredMessage="Escolha um Militar Responsável" 
+                                             required = "true" 
+                                             style="width: 85%">
+                                <f:selectItems value="#{militarMB.listaMilitar}" 
+                                               var ="militar"
+                                               itemLabel="#{militar.nome}"
+                                               itemValue="#{militar}"/>
+                            </p:selectOneMenu> 
+                            <h:outputText value="Nome da vítima: "/>
+                            <p:selectOneMenu converter="converterCivil" value="#{boletimOcorrenciaMB.boletimOcorrencia.vitimaCivil}" 
+                                             requiredMessage="Escolha o Nome da Vítima" 
+                                             required = "true" 
+                                             style="width: 85%">
+                                <f:selectItems value="#{civilMB.listaCivil}" 
+                                               var ="civil"
+                                               itemLabel="#{civil.nome}"
+                                               itemValue="#{civil}"/>
+                            </p:selectOneMenu>    
+                            <h:outputText value="Natureza do Crime: "/>
+                            <p:inputText value="#{boletimOcorrenciaMB.boletimOcorrencia.naturezaCrime}" 
+                                         requiredMessage="Campo Natureza do Crime vazio" 
+                                         required = "true"/>
+                            <h:outputText value="Descrição do Crime: "/>
+                            <p:inputText value="#{boletimOcorrenciaMB.boletimOcorrencia.descricaoCrime}" 
+                                         requiredMessage="Campo Descrição do Crime vazio" 
+                                         required = "true"/>
+                            <p:outputLabel for="mask" value="Data de Registro:" />
+                            <p:calendar id="mask" 
+                                        value="#{boletimOcorrenciaMB.boletimOcorrencia.dtRegistro}" 
+                                        pattern="dd/MM/yyyy" 
+                                        mask="true"
+                                        requiredMessage="Campo Data de Registro vazio" 
+                                        required = "true"/>
+                            <p:outputLabel for="time" value="Hora de Registro: " />
+                            <p:calendar id="time" 
+                                        value="#{boletimOcorrenciaMB.boletimOcorrencia.horaRegistro}" 
+                                        pattern="HH:mm" 
+                                        timeOnly="true"
+                                        requiredMessage="Campo Hora de Registro vazio"
+                                        required = "true"/>
+                            <h:outputText value="Ambiente do Crime: "/>
+                            <p:inputText value="#{boletimOcorrenciaMB.boletimOcorrencia.ambienteCrime}" 
+                                         requiredMessage="Campo Ambiente do Crime vazio" 
+                                         required = "true"/>
+                            <p:outputLabel for="maskDois" value="Data do Fato:" />
+                            <p:calendar id="maskDois" 
+                                        value="#{boletimOcorrenciaMB.boletimOcorrencia.dtFato}" 
+                                        pattern="dd/MM/yyyy" 
+                                        mask="true"
+                                        requiredMessage="Campo Data do Fato vazio" 
+                                        required = "true"/>
+                            <p:outputLabel for="timeDois" value="Hora de início do Fato: " />
+                            <p:calendar id="timeDois" 
+                                        value="#{boletimOcorrenciaMB.boletimOcorrencia.horaInicioFato}" 
+                                        pattern="HH:mm" 
+                                        timeOnly="true"
+                                        requiredMessage="Campo Hora de Registro vazio"
+                                        required = "true"/>
+                            <p:outputLabel for="timeTres" value="Hora Final do Fato: " />
+                            <p:calendar id="timeTres" 
+                                        value="#{boletimOcorrenciaMB.boletimOcorrencia.horaFinalFato}" 
+                                        pattern="HH:mm" 
+                                        timeOnly="true"
+                                        requiredMessage="Campo Hora Final do Fato vazio"
+                                        required = "true"/>
+                            <h:outputText value="Objetos Apreendidos: "/>
+                            <p:inputText value="#{boletimOcorrenciaMB.boletimOcorrencia.objetosApreendidos}"/>
+                            <h:outputText value="Requisição de Exames: "/>
+                            <p:inputText value="#{boletimOcorrenciaMB.boletimOcorrencia.requisicaoExames}"/>
+                            <h:outputText value="Observações: "/>
+                            <p:inputText value="#{boletimOcorrenciaMB.boletimOcorrencia.observacoes}"/>
+
+                            <h:outputText value="Estado:"/>
+                            <p:selectOneMenu id="estado" converter="converterEstado" 
+                                             value="#{estadoMB.estado}" 
+                                             requiredMessage="Escolha um Estado" 
+                                             required = "true"
+                                             style="width: 83%">
+                                <f:selectItems value="#{estadoMB.listaEstado}" 
+                                               var ="estado"
+                                               itemLabel="#{estado.nome}"
+                                               itemValue="#{estado}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputText value="Cidade:"/>
+                            <p:selectOneMenu 
+                                id="cidade" converter="converterCidade" 
+                                value="#{cidadeMB.cidade}" 
+                                required = "true" 
+                                requiredMessage="Escolha uma cidade"
+                                style="width: 83%">                              
+                                <f:selectItems value="#{cidadeMB.listaCidade}" 
+                                               var ="cidade"
+                                               itemLabel="#{cidade.nome}"
+                                               itemValue="#{cidade}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputText value="Bairro: "/>
+                            <p:selectOneMenu 
+                                id="bairro" converter="converterBairro" 
+                                value="#{bairroMB.bairro}" 
+                                required = "true" 
+                                requiredMessage="Escolha um Bairro" 
+                                style="width: 83%">
+                                <f:selectItems value="#{bairroMB.listaBairro}" 
+                                               var ="bairro"
+                                               itemLabel="#{bairro.nome}"
+                                               itemValue="#{bairro}"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="CEP: "/>
+                            <p:selectOneMenu 
+                                id="bairroCep" converter="converterBairro" 
+                                value="#{bairroMB.bairro}" 
+                                required = "true" 
+                                requiredMessage="Escolha um Cep" 
+                                style="width: 83%">
+                                <f:selectItems value="#{bairroMB.listaBairro}" 
+                                               var ="bairro"
+                                               itemLabel="#{bairro.cep}"
+                                               itemValue="#{bairro}"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="Endereço: "/>
+                            <p:selectOneMenu 
+                                id="bairroRua" converter="converterBairro" 
+                                value="#{bairroMB.bairro}" 
+                                required = "true" 
+                                requiredMessage="Escolha uma Rua" 
+                                style="width: 83%">
+                                <f:selectItems value="#{bairroMB.listaBairro}" 
+                                               var ="bairro"
+                                               itemLabel="#{bairro.endereco}"
+                                               itemValue="#{bairro}"/>
+                            </p:selectOneMenu>
+                            <br></br>
+                        </h:panelGrid>
+                        <p:commandButton value="Inserir" 
+                                         actionListener="#{boletimOcorrenciaMB.inserir()}"
+                                         oncomplete="handleComplete(xhr, status, args)"
+                                         update=":formTabelaBoletimOcorrencia"
+                                         style="width: 100%"/>
+                    </h:form>
+                </p:dialog> 
+                <script type="text/javascript">
+                    function handleComplete(xhr, status, args) {
+                        if (!args.validationFailed) {
+                            PF('dialogBoletimOcorrencia').hide();
+                        } else {
+                        }
+                    }
+                </script>
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

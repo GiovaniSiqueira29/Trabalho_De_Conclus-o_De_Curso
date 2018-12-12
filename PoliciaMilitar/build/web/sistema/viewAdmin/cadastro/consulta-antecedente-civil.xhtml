@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <body>
+        <ui:composition template="/sistema/viewAdmin/template-admin.xhtml"> 
+            <ui:define name="content">
+
+                <h:form id="chamarRelatorio">
+                    <p:commandButton value="Relatório" 
+                                     actionListener="#{civilMB.chamarRelatorio()}" 
+                                     icon="fa fa-print"
+                                     ajax="false"/>
+                </h:form><p></p>
+
+                <h:form id="formTabelaCivil" style="text-align: center">
+                    <p:dataTable id = "tabelaCivil" 
+                                 var="civil" 
+                                 value="#{civilMB.listaCivil}"
+                                 rowStyleClass="#{civil.situacao eq 'Em Liberdade' ? 'green' : civil.situacao eq 'Detido' ? 'grey' : civil.situacao eq 'Procurado' ? 'yellow': civil.situacao eq 'Foragido' ? 'red' : null}"
+                                 rows="10"
+                                 paginator="true"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15"
+                                 emptyMessage="Resultado não encontrado.">      
+                        <p:column filterBy="#{civil.nome}" headerText="Nome">
+                            <h:outputText value="#{civil.nome}"/>
+                        </p:column>
+                        <p:column headerText="Cpf" filterBy="#{civil.cpf}">
+                            <h:outputText value="#{civil.cpf}">
+                                <f:converter converterId="converterCpf" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column filterBy="#{civil.rg}" headerText="Rg">
+                            <h:outputText value="#{civil.rg}"/>
+                        </p:column>
+                        <p:column filterBy="#{civil.nomePai}" headerText="Pai">
+                            <h:outputText value="#{civil.nomePai}"/>
+                        </p:column>
+                        <p:column filterBy="#{civil.nomeMae}" headerText="Mãe">
+                            <h:outputText value="#{civil.nomeMae}"/>
+                        </p:column>
+                        <p:column headerText="Situação" filterBy="#{civil.situacao}">
+                            <h:outputText value="#{civil.situacao}">
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Pas. Criminais" filterBy="#{civil.passagem}">
+                            <h:outputText value="#{civil.passagem}">
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Ações">
+                            <p:commandButton value="Alterar" 
+                                             oncomplete="PF('dialogCivil').show()" 
+                                             update=":formCadastroCivil"
+                                             style="background: #EEE8AA"
+                                             icon="fa fa-fw fa-edit">
+                                <f:setPropertyActionListener value="#{civil}" target="#{civilMB.civil}"/>
+                            </p:commandButton>
+<!--                                <p:fileUpload fileUploadListener="#{civilMB.handleFileUpload}" mode="advanced" dragDropSupport="false"
+                                              multiple="true" sizeLimit="1000000" fileLimit="4" allowTypes="/(\.|\/)(gif|jpe?g|png|txt)$/" />-->
+                        </p:column>
+                    </p:dataTable>
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                        <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                    </p:confirmDialog>
+                </h:form>
+
+                <p:growl autoUpdate="true"/>
+                <p:dialog id="dialogCivil" header="Alterar Situação" widgetVar="dialogCivil" modal="true" height="auto" width="auto" >
+                    <p:messages id ="mensagem" closable="true" />
+                    <h:form id="formCadastroCivil">
+                        <h:panelGrid columns="4" >
+                            <h:outputText value="Passagens Criminais:"/>
+                            <p:inputText  value="#{civilMB.civil.passagem}"
+                                          requiredMessage="Campo Passagens Criminais vazio"
+                                          required = "true"/>
+
+                            <h:outputText value="Situação:"/>
+                            <h:selectOneMenu value="#{civilMB.civil.situacao}"
+                                             requiredMessage="Campo Situação vazio"
+                                             required="true" 
+                                             style="width: 100%">
+                                <f:selectItem itemLabel="Selecione" itemValue=""/>
+                                <f:selectItem itemLabel="Em Liberdade" itemValue="Em Liberdade"/>
+                                <f:selectItem itemLabel="Foragido" itemValue="Foragido"/>
+                                <f:selectItem itemLabel="Procurado" itemValue="Procurado"/>
+                                <f:selectItem itemLabel="Detido" itemValue="Detido"/>
+                            </h:selectOneMenu>      
+                        </h:panelGrid>
+                        <br></br>
+                        <p:commandButton value="Inserir" 
+                                         actionListener="#{civilMB.inserir()}"
+                                         oncomplete="handleComplete(xhr, status, args)"
+                                         update=":formTabelaCivil"/>
+                    </h:form>
+                </p:dialog> 
+                <script type="text/javascript">
+                    function handleComplete(xhr, situacao, args) {
+                        if (!args.validationFailed) {
+                            PF('dialogCivil').hide();
+                        } else {
+                        }
+                    }
+                </script>
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>
+

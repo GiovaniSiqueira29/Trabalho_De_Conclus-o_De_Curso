@@ -1,0 +1,249 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+
+        <ui:composition template="/sistema/viewAdmin/template-admin.xhtml"> 
+
+            <ui:define name="content">
+
+                <h:form id="botaoCadastrar">
+                    <p:commandButton actionListener="#{notificacaoMB.atualizarNotificacao()}"
+                                     value="Cadastrar Notificação" 
+                                     oncomplete="PF('dialogNotificacao').show()" 
+                                     update=":formCadastroNotificacao"/>
+                </h:form>
+                <h:form id="chamarRelatorio">
+                    <p:commandButton value="Relatório" 
+                                     actionListener="#{notificacaoMB.chamarRelatorio()}" 
+                                     icon="fa fa-print"
+                                     ajax="false"/>
+                </h:form><p></p>
+                <h:form id="formTabelaNotificacao" style="text-align: center">
+                    <p:dataTable var="notificacao" 
+                                 value="#{notificacaoMB.listaNotificacao}"
+                                 rows="10"
+                                 paginator="true"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15"
+                                 emptyMessage="Resultado não encontrado.">
+                        <p:column headerText="Protocolo" filterBy="#{notificacao.id}">
+                            <h:outputText value="#{notificacao.id}"/>
+                        </p:column>
+                        <p:column headerText="Réu" filterBy="#{notificacao.reuCivil.nome}">
+                            <h:outputText value="#{notificacao.reuCivil.nome}"/>
+                        </p:column>
+                        <p:column headerText="Magistrado" filterBy="#{notificacao.magistrado.nome}">
+                            <h:outputText value="#{notificacao.magistrado.nome}"/>
+                        </p:column>
+                        <p:column headerText="Orgão" filterBy="#{notificacao.orgao}">
+                            <h:outputText value="#{notificacao.orgao}"/>
+                        </p:column>
+                        <p:column headerText="Motivo" filterBy="#{notificacao.motivo}">
+                            <h:outputText value="#{notificacao.motivo}"/>
+                        </p:column>
+                        <p:column headerText="Descrição" filterBy="#{notificacao.descricao}">
+                            <h:outputText value="#{notificacao.descricao}"/>
+                        </p:column>
+                        <p:column headerText="Data do Fato">
+                            <h:outputText value="#{notificacao.dtFato}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Ações" style=" width:20%">
+                            <p:commandButton value="Ver" 
+                                             update=":formDialogInfo:boletimDetalhe"
+                                             oncomplete="PF('infoBoletim').show()" 
+                                             icon="ui-icon-search" 
+                                             title="View"
+                                             style="background: #B3FFD9">
+                                <f:setPropertyActionListener value="#{notificacao}" target="#{notificacaoMB.notificacao}" />
+                            </p:commandButton>
+                            <p:commandButton value="Alterar" 
+                                             oncomplete="PF('dialogNotificacao').show()" 
+                                             update=":formCadastroNotificacao"
+                                             style="background: #FFFFB3"
+                                             icon="fa fa-fw fa-edit">
+                                <f:setPropertyActionListener value="#{notificacao}" target="#{notificacaoMB.notificacao}"/>
+                            </p:commandButton>
+                            <p:commandButton value="Excluir" 
+                                             update="@form" 
+                                             actionListener="#{notificacaoMB.remover(notificacao.id)}"
+                                             style="background: #FFB3B3"
+                                             icon="fa fa-trash">
+                                <p:confirm header="Confirmação" message="Deseja realmente excluir?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                        <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                    </p:confirmDialog>
+                </h:form>
+                <h:form id="formDialogInfo">
+                    <p:dialog header="Informações do Boletim" widgetVar="infoBoletim" modal="true" showEffect="fade" hideEffect="fade">
+                        <p:outputPanel id="boletimDetalhe">
+                            <p:panelGrid  columns="2" rendered="#{not empty notificacaoMB.notificacao}" columnClasses="label,value">
+                                <h:outputText value="Protocolo :" />
+                                <h:outputText value="#{notificacaoMB.notificacao.id}" />
+                                <h:outputText value="Réu :" />
+                                <h:outputText value="#{notificacaoMB.notificacao.reuCivil.nome}" />
+                                <h:outputText value="Nome do Magistrado: " />
+                                <h:outputText value="#{notificacaoMB.notificacao.magistrado.nome}" />
+                                <h:outputText value="Orgão :" />
+                                <h:outputText value="#{notificacaoMB.notificacao.orgao}" />
+                                <h:outputText value="Motivo :" />
+                                <h:outputText value="#{notificacaoMB.notificacao.motivo}" />
+                                <h:outputText value="Opção de documento :" />
+                                <h:outputText value="#{notificacaoMB.notificacao.opcao}" />
+                                <h:outputText value="Descrição :" />
+                                <h:outputText value="#{notificacaoMB.notificacao.descricao}" />
+                            </p:panelGrid>
+                        </p:outputPanel>
+                    </p:dialog>
+                </h:form>
+
+                <p:growl autoUpdate="true"/>
+                <p:dialog id="dialogNotificacao" header="Cadastrar Notificação" widgetVar="dialogNotificacao" modal="true" height="auto" width="auto">
+                    <p:messages id ="mensagem" closable="true"/>
+                    <h:form id="formCadastroNotificacao">
+                        <h:panelGrid columns="2">
+                            <h:outputText value="Nome do réu: "/>
+                            <p:selectOneMenu converter="converterCivil" value="#{notificacaoMB.notificacao.reuCivil}" 
+                                             requiredMessage="Escolha o Nome do réu" 
+                                             required = "true" 
+                                             style="width: 85%">
+                                <f:selectItems value="#{civilMB.listaCivil}" 
+                                               var ="civil"
+                                               itemLabel="#{civil.nome}"
+                                               itemValue="#{civil}"/>
+                            </p:selectOneMenu>  
+                            <h:outputText value="Nome do Magistrado: "/>
+                            <p:selectOneMenu converter="converterMagistrado" value="#{notificacaoMB.notificacao.magistrado}" 
+                                             requiredMessage="Escolha um Magistrado Responsável" 
+                                             required = "true" 
+                                             style="width: 85%">
+                                <f:selectItems value="#{magistradoMB.listaMagistrado}" 
+                                               var ="magistrado"
+                                               itemLabel="#{magistrado.nome}"
+                                               itemValue="#{magistrado}"/>
+                            </p:selectOneMenu> 
+                            
+                            <h:outputText value="Orgão: "/>
+                            <p:inputText value="#{notificacaoMB.notificacao.orgao}" 
+                                         requiredMessage="Campo Orgão vazio" 
+                                         required = "true"/>
+                            <h:outputText value="Descrição do Crime: "/>
+                            <p:inputText value="#{notificacaoMB.notificacao.motivo}" 
+                                         requiredMessage="Campo Motivo vazio" 
+                                         required = "true"/>
+                            <p:outputLabel for="mask" value="Data de Registro:" />
+                            <p:calendar id="mask" 
+                                        value="#{notificacaoMB.notificacao.dtFato}" 
+                                        pattern="dd/MM/yyyy" 
+                                        mask="true"
+                                        requiredMessage="Campo Data de Registro vazio" 
+                                        required = "true"/>
+                            <h:outputText value="Descrição: "/>
+                            <p:inputText value="#{notificacaoMB.notificacao.descricao}" 
+                                         requiredMessage="Campo Descrição vazio" 
+                                         required = "true"/>
+                            <h:outputText value="Observação: "/>
+                            <p:inputText value="#{notificacaoMB.notificacao.observacao}"/>
+                            <h:outputText value="Opção de Documento: "/>
+                            <h:selectOneMenu value="#{notificacaoMB.notificacao.opcao}"
+                                             requiredMessage="Campo Opção do Documento vazio"
+                                             required="true" 
+                                             style="width: 100%">
+                                <f:selectItem itemLabel="Selecione" itemValue=""/>
+                                <f:selectItem itemLabel="Intimação" itemValue="Citação" />
+                                <f:selectItem itemLabel="Citação" itemValue="Citação"/>
+                            </h:selectOneMenu>
+                            
+                            <h:outputText value="Estado:"/>
+                            <p:selectOneMenu id="estado" converter="converterEstado" 
+                                             value="#{notificacaoMB.notificacao.estado}" 
+                                             requiredMessage="Escolha um Estado" 
+                                             required = "true"
+                                             style="width: 83%">
+                                <f:selectItems value="#{estadoMB.listaEstado}" 
+                                               var ="estado"
+                                               itemLabel="#{estado.nome}"
+                                               itemValue="#{estado}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputText value="Cidade:"/>
+                            <p:selectOneMenu 
+                                id="cidade" converter="converterCidade" 
+                                value="#{notificacaoMB.notificacao.cidade}" 
+                                required = "true" 
+                                requiredMessage="Escolha uma Cidade"
+                                style="width: 83%">                              
+                                <f:selectItems value="#{cidadeMB.listaCidade}" 
+                                               var ="cidade"
+                                               itemLabel="#{cidade.nome}"
+                                               itemValue="#{cidade}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputText value="Bairro: "/>
+                            <p:selectOneMenu 
+                                id="bairro" converter="converterBairro" 
+                                value="#{notificacaoMB.notificacao.bairro}" 
+                                required = "true" 
+                                requiredMessage="Escolha um Bairro" 
+                                style="width: 83%">
+                                <f:selectItems value="#{bairroMB.listaBairro}" 
+                                               var ="bairro"
+                                               itemLabel="#{bairro.nome}"
+                                               itemValue="#{bairro}"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="CEP: "/>
+                            <p:selectOneMenu 
+                                id="bairroCep" converter="converterBairro" 
+                                value="#{bairroMB.bairro}" 
+                                required = "true" 
+                                requiredMessage="Escolha um Cep" 
+                                style="width: 83%">
+                                <f:selectItems value="#{bairroMB.listaBairro}" 
+                                               var ="bairro"
+                                               itemLabel="#{bairro.cep}"
+                                               itemValue="#{bairro}"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="Endereço: "/>
+                            <p:selectOneMenu 
+                                id="bairroRua" converter="converterBairro" 
+                                value="#{notificacaoMB.notificacao.bairro}" 
+                                required = "true" 
+                                requiredMessage="Escolha uma Rua" 
+                                style="width: 83%">
+                                <f:selectItems value="#{bairroMB.listaBairro}" 
+                                               var ="bairro"
+                                               itemLabel="#{bairro.endereco}"
+                                               itemValue="#{bairro}"/>
+                            </p:selectOneMenu>
+                            <br></br>
+                        </h:panelGrid>
+                        <p:commandButton value="Inserir" 
+                                         actionListener="#{notificacaoMB.inserir()}"
+                                         oncomplete="handleComplete(xhr, status, args)"
+                                         update=":formTabelaNotificacao"
+                                         style="width: 100%"/>
+                    </h:form>
+                </p:dialog> 
+                <script type="text/javascript">
+                    function handleComplete(xhr, status, args) {
+                        if (!args.validationFailed) {
+                            PF('dialogNotificacao').hide();
+                        } else {
+                        }
+                    }
+                </script>
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

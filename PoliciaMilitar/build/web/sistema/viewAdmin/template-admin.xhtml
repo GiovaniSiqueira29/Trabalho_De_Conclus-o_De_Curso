@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="./css/default.css"/>
+        <h:outputStylesheet name="./css/cssLayout.css"/>
+        <h:outputStylesheet name="./css/cssLinhas.css"/>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous"></link>
+        <title>Tela do Administrador</title>
+    </h:head>
+
+    <h:body>
+<!--        <h:graphicImage name="./imagens/bg.jpg" width="100%" style="position: absolute"/>-->
+        <div id="top" align="center">
+            <!--            <img src="./resources/imagens/pcpr1.png"/> -->
+            <h:graphicImage name="./imagens/pcpr_logo.jpeg" id="logo"/>
+<!--            <h:graphicImage name="./imagens/brasaoPMPR.jpg" id="pmpr"/>-->
+            <div id="menu">
+                <ui:insert name="top">
+                    <h:form>  
+                        <p:growl id="messages"/>
+                        <p:menubar id="barraMenu">
+                            <p:submenu label="Consultar" icon="fa fa-search">
+                                <p:menuitem value="Cidadãos" icon="fa fa-user" url="/sistema/viewAdmin/cadastro/consulta-antecedente-civil.jsf" />
+                            </p:submenu>
+                            <p:submenu label="Gerenciar Documentos" icon="fa fa-file">          
+                                <p:menuitem value="Boletins" icon="fa fa-plus" url="/sistema/viewAdmin/cadastro/cadastro-boletim-ocorrencia.jsf" />
+                                <p:menuitem value="Mandados Judiciais" icon="fa fa-plus" url="/sistema/viewAdmin/cadastro/cadastro-mandado-judicial.jsf" />
+                                <p:menuitem value="Notificação" icon="fa fa-plus" url="/sistema/viewAdmin/cadastro/cadastro-notificacao.jsf" />
+                               
+                            </p:submenu> 
+                            <p:submenu label="Cidadãos" icon="fa fa-users">
+                                <p:menuitem value="Cadastrar Cidadãos" icon="fa fa-user-plus" url="/sistema/viewAdmin/cadastro/cadastro-civil.jsf" />
+                                <p:menuitem value="Cadastrar Policiais" icon="fa fa-user-plus" url="/sistema/viewAdmin/cadastro/cadastro-militar.jsf" />
+                                <p:menuitem value="Cadastrar Magistrados" icon="fa fa-balance-scale" url="/sistema/viewAdmin/cadastro/cadastro-magistrado.jsf" /> 
+                            </p:submenu>
+                            <p:submenu label="Locais" icon="fa fa-map" >
+                                <p:menuitem value="Cadastrar Estados" icon="ui-icon-circle-plus" url="/sistema/viewAdmin/cadastro/cadastro-estado.jsf" />
+                                <p:menuitem value="Cadastrar Cidades" icon="ui-icon-circle-plus" url="/sistema/viewAdmin/cadastro/cadastro-cidade.jsf" />
+                                <p:menuitem value="Cadastrar Bairros" icon="ui-icon-circle-plus" url="/sistema/viewAdmin/cadastro/cadastro-bairro.jsf" />
+                            </p:submenu>
+                            <p:menuitem value="Ajuda" icon="fa fa-question" url="/sistema/viewAdmin/tela-ajuda.jsf" />
+                            <f:facet name="options">
+                                <h:outputLink value="#{facesContext.externalContext.requestContextPath}/j_spring_security_logout">
+                                    <p:commandButton type="button" value="Sair" icon="fa fa-power-off" style="color: #000000;  font-weight : bold"/>
+                                </h:outputLink>
+                            </f:facet>
+                        </p:menubar>
+                    </h:form>
+
+                </ui:insert>
+            </div>
+        </div>
+        <div id="content" class="center_content">
+            <div id="miolo" align="center">
+                <ui:insert name="content"></ui:insert>
+            </div>
+        </div>
+        <div id="bottom">
+            <ui:insert name="bottom"><h3>Destacamento da Polícia Militar de Tamboara - PR</h3></ui:insert>
+        </div>
+
+    </h:body>
+
+</html>

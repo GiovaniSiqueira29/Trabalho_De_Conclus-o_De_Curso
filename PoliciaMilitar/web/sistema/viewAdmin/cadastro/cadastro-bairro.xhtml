@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+
+        <ui:composition template="/sistema/viewAdmin/template-admin.xhtml"> 
+
+            <ui:define name="content">
+
+                <h:form id="botaoCadastrar">
+                    <p:commandButton actionListener="#{bairroMB.atualizarBairros()}"
+                                     value="Cadastrar Bairro" 
+                                     oncomplete="PF('dialogBairro').show()" 
+                                     update=":formCadastroBairro"/>
+                </h:form><p></p>
+
+                <h:form id="formTabelaBairro" style="text-align: center">
+                    <p:dataTable var="bairro" value="#{bairroMB.listaBairro}">
+                        <p:column headerText="Nome">
+                            <h:outputText value="#{bairro.nome}"/>
+                        </p:column>
+                        <p:column headerText="Cep">
+                            <h:outputText value="#{bairro.cep}"/>
+                        </p:column>
+                        <p:column headerText="Cidade">
+                            <h:outputText value="#{bairro.cidade.nome}"/>
+                        </p:column>
+                        <p:column headerText="Ações" style=" width:20%">
+                            <p:commandButton value="Alterar" 
+                                             oncomplete="PF('dialogBairro').show()" 
+                                             update=":formCadastroBairro"
+                                             style="background: #FFFFB3"
+                                             icon="fa fa-fw fa-edit">
+                                <f:setPropertyActionListener value="#{bairro}" target="#{bairroMB.bairro}"/>
+                            </p:commandButton>
+                            <p:commandButton value="Excluir" 
+                                             update="@form" 
+                                             actionListener="#{bairroMB.remover(bairro.id)}"
+                                             style="background: #FFB3B3"
+                                             icon="fa fa-trash">
+                                <p:confirm header="Confirmação" message="Deseja realmente excluir?" icon="ui-icon-alert" />
+                            </p:commandButton>
+
+                        </p:column>
+                    </p:dataTable>
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                        <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                    </p:confirmDialog>
+                </h:form>
+                
+            <p:growl autoUpdate="true"/>
+                <p:dialog id="dialogBairro" header="Cadastro de Bairros" widgetVar="dialogBairro" modal="true" height="auto" width="auto">
+                    <p:messages id ="mensagem" closable="true"/>
+                    <h:form id="formCadastroBairro">
+                        <h:panelGrid columns="2">
+                            <h:outputText value="Nome: "/>
+                            <p:inputText value="#{bairroMB.bairro.nome}" 
+                                         requiredMessage="Campo Nome vazio" 
+                                         required = "true"/>
+                            <h:outputText value="Cep: "/>
+                            <p:inputText value="#{bairroMB.bairro.cep}" 
+                                         requiredMessage="Campo Cep vazio" 
+                                         required = "true"
+                                         validator="validarCep"
+                                         maxlength="8"/>
+                            <h:outputText value="Endereço: "/>
+                            <p:inputText value="#{bairroMB.bairro.endereco}" 
+                                         requiredMessage="Campo Endereço vazio" 
+                                         required = "true"/>
+                            <h:outputText value="Cidade: "/>
+                            <p:selectOneMenu converter="converterCidade" 
+                                             value="#{bairroMB.bairro.cidade}" 
+                                             requiredMessage="Escolha uma cidade" 
+                                             required = "true" 
+                                             style="width: 85%">
+                                <f:selectItems value="#{cidadeMB.listaCidade}" 
+                                               var ="cidade"
+                                               itemLabel="#{cidade.nome}"
+                                               itemValue="#{cidade}"/>
+                            </p:selectOneMenu>
+                            <br></br>
+                        </h:panelGrid>
+                        <p:commandButton value="Inserir" 
+                                         actionListener="#{bairroMB.inserir()}"
+                                         oncomplete="handleComplete(xhr, status, args)"
+                                         update=":formTabelaBairro"
+                                         style="width: 100%"/>
+                    </h:form>
+                </p:dialog> 
+                <script type="text/javascript">
+                    function handleComplete(xhr, status, args) {
+                        if (!args.validationFailed) {
+                            PF('dialogBairro').hide();
+                        } else {
+                        }
+                    }
+                </script>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>
